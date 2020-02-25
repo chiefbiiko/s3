@@ -36,6 +36,10 @@ export async function baseOp(
     iteratePages = true
   }: OpOptions = NO_PARAMS_OPS.has(op) ? params || {} : {}
 ): Promise<Doc> {
+  // TODO: if a bucket is specified here
+  // call deriveHostEndpoint here in this scope - then pass the newly merged  
+  // conf on to baseFetch
+  
   let translator: any;
   let outputShape: any;
 

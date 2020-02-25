@@ -24,7 +24,7 @@ export async function baseFetch(
   let response: Response = await fetch(conf.endpoint, {
     method: httpVerb,
     headers,
-    body: httpVerb === "GET" ? payload : 
+    body: payload
   });
 
   let body: Doc = await response.json();
