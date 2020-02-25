@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Setup for testing s3 in the AWS cloud
+Parameters:
+  BucketName:
+    Type: String
+    Description: Name of the S3 testing bucket
+    Default: testing_bucket
+Resources:
+  Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+  User:
+    Type: AWS::IAM::User
+    Properties:
+      Policies:
+        - PolicyName: S3TestingPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: AllowS3FullAccess
+                Effect: Allow
+                Action: s3:*
+                Resource: !GetAtt Bucket.Arn
+  AccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      Status: Active
+      UserName: !Ref User
+Outputs:
+  BucketName:
+    Description: Name of the S3 testing bucket
+    Value: !Ref BucketName
+  UserArn:
+    Description: IAM user with full access to S3
+    Value: !GetAtt User.Arn
+  UserAccessKeyId:
+    Description: Access key id of the IAM user
+    Value: !Ref AccessKey
+  UserSecretAccessKey:
+    Description: Secret access key of the IAM user
+    Value: !GetAtt AccessKey.SecretAccessKey
