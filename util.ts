@@ -14,6 +14,17 @@ export function camelCase(text: string): string {
   return `${text[0].toLowerCase()}${text.slice(1)}`;
 }
 
+/** Derives host and endpoint. */
+export function deriveHostEndpoint({
+  region,
+  bucket,
+  port = 443,
+  host = `${bucket}.s3.${region}.amazonaws.com`,
+  endpoint = `https://${host}:${port}/`
+}): { host: string; endpoint: string } {
+  return { host, endpoint };
+}
+
 // /** Defines a property. */
 // export function property(
 //   obj: any,
