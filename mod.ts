@@ -1,8 +1,11 @@
 import { baseOp, deriveConfig } from "./client/mod.ts";
 import { Doc, camelCase } from "./util.ts";
 
-// TODO: 
+// TODO:
 // + add a changelog that integrates with `git tag -a`
+// + add a content-type header to requests
+// + presend headers with 100-continue Expect header
+// + add a content-md5 header for traffic data integrity
 // + implement chunked uploads
 // + think of how to maintain and tackle a feature roadmap
 
@@ -38,6 +41,7 @@ export interface ClientConfig {
   region?: string; // us-west-2
   profile?: string; // default
   // canonicalUri?: string; // fx /path/to/somewhere
+  bucket?: string; // yo-bucket
   port?: number; // 80
 }
 
