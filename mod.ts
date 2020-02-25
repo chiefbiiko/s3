@@ -1,6 +1,11 @@
 import { baseOp, deriveConfig } from "./client/mod.ts";
 import { Doc, camelCase } from "./util.ts";
 
+// TODO: 
+// + add a changelog that integrates with `git tag -a`
+// + implement chunked uploads
+// + think of how to maintain and tackle a feature roadmap
+
 /** Convenience export. */
 export { Doc } from "./util.ts";
 

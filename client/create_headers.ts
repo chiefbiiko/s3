@@ -6,13 +6,15 @@ import { ClientConfig } from "../mod.ts";
 /** Algorithm identifer. */
 const ALGORITHM: string = "AWS4-HMAC-SHA256";
 
+/** zero-bytes SHA256. */
+const ZERO_BYTES_SHA256_HEX: string = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+
 // /** Content type header value for POST requests. */
 // const CONTENT_TYPE: string = "application/x-amz-json-1.0";
 
 /** Required configuration for assembling headers. */
 export interface HeadersConfig extends ClientConfig {
   host: string; // dynamodb.us-west-2.amazonaws.com
-  // method: string; // POST
   cache: Doc; // internal cache for expensive-2-make signing key (& credScope)
   date?: Date; // allows reusing a date for 5min (max signature timestamp diff)
 }
@@ -29,26 +31,19 @@ export async function createHeaders(
   if (refreshCredentials) {
     await conf.cache.refresh();
   }
-
-  // const amzTarget: string = `DynamoDB_20120810.${op}`;
-
+  
   const amzDate: string = date.format(conf.date || new Date(), "amz");
-
-  // const httpVerb: string = OP2VERB.get(op);
-
-  // const canonicalUri: string = conf.canonicalUri || "/";
 
   const canonicalUri: string = objectKey;
 
   const canonicalQueryString: string = "";
 
-  // const canonicalHeaders: string = `content-type:${CONTENT_TYPE}\nhost:${conf.host}\nx-amz-date:${amzDate}\nx-amz-target:${amzTarget}\n`;
-
+  // TODO: add and map content-type to canonicalHeaders and signedHeaders
   const canonicalHeaders: string = `host:${conf.host}\nx-amz-date:${amzDate}\n`;
 
   const signedHeaders: string = "host;x-amz-date";
 
-  const payloadHash: string = sha256(payload, null, "hex") as string;
+  const payloadHash: string = httpVerb === "GET" ? ZERO_BYTES_SHA256_HEX : sha256(payload, null, "hex") as string;
 
   const canonicalRequest: string = `${httpVerb}\n${canonicalUri}\n${canonicalQueryString}\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
 
@@ -74,10 +69,9 @@ export async function createHeaders(
   const headers: Headers = new Headers({
     // "Content-Type": CONTENT_TYPE,
     "X-Amz-Date": amzDate,
-    // "X-Amz-Target": amzTarget,
     Authorization: authorizationHeader,
-    // 4 chunked uploads the X-Amz-Content-Sha256 header should be set to
-    // STREAMING-AWS4-HMAC-SHA256-PAYLOAD
+    // NOTE: 4 chunked uploads the X-Amz-Content-Sha256 header should be set to
+    // "STREAMING-AWS4-HMAC-SHA256-PAYLOAD"
     "X-Amz-Content-Sha256": payloadHash
   });
 

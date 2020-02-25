@@ -3,7 +3,10 @@ import { HeadersConfig, createHeaders } from "./create_headers.ts";
 import { Doc } from "../util.ts";
 
 /** Maps S3 operations to their corresponding HTTP verbs. */
-const OP2VERB: Map<string, string> = new Map<string, string>();
+const OP2VERB: Map<string, string> = new Map<string, string>([
+  ["PutObject", "PUT"],
+  ["GetObject", "GET"]
+]);
 
 /** Base fetch. */
 export async function baseFetch(
@@ -18,7 +21,8 @@ export async function baseFetch(
 
   let headers: Headers = await createHeaders(
     op,
-    params.Key,
+    // TODO: check this!!!
+    params.Key, 
     payload,
     conf as HeadersConfig
   );
