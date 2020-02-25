@@ -1,7 +1,11 @@
+export { contentType } from "https://deno.land/std@v0.34.0/media_types/mod.ts";
+
 export {
   encode,
   decode
 } from "https://denopkg.com/chiefbiiko/std-encoding@v1.0.0/mod.ts";
+
+export { extname } from "https://deno.land/std@v0.34.0/path/mod.ts";
 
 export {
   get
