@@ -1,6 +1,12 @@
 const ANY_BUT_DIGITS: RegExp = /[^\d]/g;
 const ANY_BUT_DIGITS_T: RegExp = /[^\dT]/g;
 
+/** Maps S3 operations to their corresponding HTTP verbs. */
+export const opVerbs: Map<string, string> = new Map<string, string>([
+  ["PutObject", "PUT"],
+  ["GetObject", "GET"]
+]);
+
 /** Generic document. */
 export interface Doc {
   [key: string]: any;

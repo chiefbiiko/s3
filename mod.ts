@@ -12,21 +12,10 @@ import { Doc, camelCase } from "./util.ts";
 /** Convenience export. */
 export { Doc } from "./util.ts";
 
-// /** Generic representation of a DynamoDB client. */
-// export interface DynamoDBClient {
-//   describeEndpoints: (options?: Doc) => Promise<Doc>;
-//   describeLimits: (options?: Doc) => Promise<Doc>;
-//   listTables: (options?: Doc) => Promise<Doc>;
-//   scan: (
-//     params: Doc,
-//     options?: Doc
-//   ) => Promise<Doc | AsyncIterableIterator<Doc>>;
-//   query: (
-//     params: Doc,
-//     options?: Doc
-//   ) => Promise<Doc | AsyncIterableIterator<Doc>>;
-//   [key: string]: (params: Doc, options?: Doc) => Promise<Doc>;
-// }
+/** Generic representation of a S3 client. */
+export interface S3Client {
+  [key: string]: (params: Doc, options?: Doc) => Promise<Doc>;
+}
 
 /** Credentials. */
 export interface Credentials {
@@ -40,60 +29,22 @@ export interface ClientConfig {
   credentials?: Credentials | (() => Credentials | Promise<Credentials>);
   region?: string; // us-west-2
   profile?: string; // default
-  // canonicalUri?: string; // fx /path/to/somewhere
   bucket?: string; // yo-bucket
   port?: number; // 80
 }
 
-// /** DynamoDB operations. */
-// export const OPS: Set<string> = new Set<string>([
-//   "BatchGetItem",
-//   "BatchWriteItem",
-//   "CreateBackup",
-//   "CreateGlobalTable",
-//   "CreateTable",
-//   "DeleteBackup",
-//   "DeleteItem",
-//   "DeleteTable",
-//   "DescribeBackup",
-//   "DescribeContinuousBackups",
-//   "DescribeEndpoints",
-//   "DescribeGlobalTable",
-//   "DescribeGlobalTableSettings",
-//   "DescribeLimits",
-//   "DescribeTable",
-//   "DescribeTimeToLive",
-//   "GetItem",
-//   "ListBackups",
-//   "ListGlobalTables",
-//   "ListTables",
-//   "ListTagsOfResource",
-//   "PutItem",
-//   "Query",
-//   "RestoreTableFromBackup",
-//   "RestoreTableToPointInTime",
-//   "Scan",
-//   "TagResource",
-//   "TransactGetItems",
-//   "TransactWriteItems",
-//   "UntagResource",
-//   "UpdateContinuousBackups",
-//   "UpdateGlobalTable",
-//   "UpdateGlobalTableSettings",
-//   "UpdateItem",
-//   "UpdateTable",
-//   "UpdateTimeToLive"
-// ]);
+/** S3 operations. */
+export const OPS: Set<string> = new Set<string>([]);
 
-// /** Creates a DynamoDB client. */
-// export function createClient(conf?: ClientConfig): DynamoDBClient {
-//   const _conf: Doc = deriveConfig(conf);
-//
-//   const dyno: DynamoDBClient = {} as DynamoDBClient;
-//
-//   for (const op of OPS) {
-//     dyno[camelCase(op)] = baseOp.bind(null, _conf, op);
-//   }
-//
-//   return dyno;
-// }
+/** Creates a S3 client. */
+export function createClient(conf?: ClientConfig): S3Client {
+  const _conf: Doc = deriveConfig(conf);
+
+  const s3: S3Client = {} as S3Client;
+
+  for (const op of OPS) {
+    s3[camelCase(op)] = baseOp.bind(null, _conf, op);
+  }
+
+  return s3;
+}

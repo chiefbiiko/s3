@@ -1,12 +1,6 @@
 import { encode } from "../deps.ts";
 import { HeadersConfig, createHeaders } from "./create_headers.ts";
-import { Doc } from "../util.ts";
-
-/** Maps S3 operations to their corresponding HTTP verbs. */
-const OP2VERB: Map<string, string> = new Map<string, string>([
-  ["PutObject", "PUT"],
-  ["GetObject", "GET"]
-]);
+import { Doc, opVerbs } from "../util.ts";
 
 /** Base fetch. */
 export async function baseFetch(
@@ -14,15 +8,15 @@ export async function baseFetch(
   op: string,
   params: Doc
 ): Promise<Doc> {
+    const httpVerb: string = opVerbs.get(op);
+    
  // TODO: figure out what da payload should be 4 S3
-  const payload: Uint8Array = encode(JSON.stringify(params), "utf8");
-
-  const httpVerb: string = OP2VERB.get(op);
+  const payload: Uint8Array = httpVerb === "GET" ? null : encode("TODO");
 
   let headers: Headers = await createHeaders(
-    op,
+    httpVerb,
     // TODO: check this!!!
-    params.Key, 
+    params.Key,
     payload,
     conf as HeadersConfig
   );
@@ -30,7 +24,7 @@ export async function baseFetch(
   let response: Response = await fetch(conf.endpoint, {
     method: httpVerb,
     headers,
-    body: payload
+    body: httpVerb === "GET" ? payload : 
   });
 
   let body: Doc = await response.json();
