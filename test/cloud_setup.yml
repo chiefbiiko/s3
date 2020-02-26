@@ -4,7 +4,7 @@ Parameters:
   BucketName:
     Type: String
     Description: Name of the S3 testing bucket
-    Default: testing_bucket
+    Default: s3_testing_bucket
 Resources:
   Bucket:
     Type: AWS::S3::Bucket
@@ -18,7 +18,7 @@ Resources:
           PolicyDocument:
             Version: 2012-10-17
             Statement:
-              - Sid: AllowS3FullAccess
+              - Sid: AllowFullAccessOnTestingBucket
                 Effect: Allow
                 Action: s3:*
                 Resource: !GetAtt Bucket.Arn
