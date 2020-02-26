@@ -24,8 +24,8 @@ export function camelCase(text: string): string {
 export function deriveHostEndpoint({
   region,
   bucket,
-  port = 443,
   host = `${bucket}.s3.${region}.amazonaws.com`,
+  port = 443,
   endpoint = `https://${host}:${port}/`
 }): { host: string; endpoint: string } {
   return { host, endpoint };

@@ -8,6 +8,8 @@ import { Doc, camelCase } from "./util.ts";
 // + add a content-md5 header for traffic data integrity
 // + implement chunked uploads
 // + think of how to maintain and tackle a feature roadmap
+//   + follow the official js sdk afap
+//     https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html
 
 /** Convenience export. */
 export { Doc } from "./util.ts";
@@ -27,14 +29,20 @@ export interface Credentials {
 /** Client configuration. */
 export interface ClientConfig {
   credentials?: Credentials | (() => Credentials | Promise<Credentials>);
-  region?: string; // us-west-2
+  region?: string; // us-east-1
   profile?: string; // default
   bucket?: string; // yo-bucket
-  port?: number; // 80
+  host?: string; // yo-bucket.s3.us-east-1.amazonaws.com
+  port?: number; // 443
+  endpoint?: string; // https://yo-bucket.s3.us-east-1.amazonaws.com:443
 }
 
 /** S3 operations. */
-export const OPS: Set<string> = new Set<string>([]);
+export const OPS: Set<string> = new Set<string>([
+  "CreateBucket",
+  "GetObject",
+  "PutObject"
+]);
 
 /** Creates a S3 client. */
 export function createClient(conf?: ClientConfig): S3Client {
