@@ -23,7 +23,7 @@ Resources:
 Outputs:
   BucketName:
     Description: Name of the S3 testing bucket
-    Value: !Ref BucketName
+    Value: !Ref Bucket
   UserArn:
     Description: IAM user with full access to S3
     Value: !GetAtt User.Arn
