@@ -4,7 +4,7 @@ Parameters:
   BucketName:
     Type: String
     Description: Name of the S3 testing bucket
-    Default: s3_testing_bucket
+    Default: s3-testing-bucket
 Resources:
   Bucket:
     Type: AWS::S3::Bucket
