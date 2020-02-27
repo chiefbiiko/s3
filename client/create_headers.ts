@@ -31,10 +31,11 @@ export async function createHeaders(
   if (refreshCredentials) {
     await conf.cache.refresh();
   }
-  
+
   const amzDate: string = date.format(conf.date || new Date(), "amz");
 
-  const canonicalUri: string = objectKey;
+  // const canonicalUri: string = objectKey; // "/" + objectKey;
+  const canonicalUri: string = objectKey.startsWith("/") ? objectKey : `/${objectKey}`
 
   const canonicalQueryString: string = "";
 

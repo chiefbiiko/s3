@@ -1,11 +1,11 @@
 import { get } from "../deps.ts";
-import { ClientConfig } from "../mod.ts";
 import { Doc, deriveHostEndpoint } from "../util.ts";
 import { createCache } from "./create_cache.ts";
+import {ClientConfig} from "../mod.ts";
 
 /** Derives an internal config object from a ClientConfig. */
 export function deriveConfig(conf: ClientConfig = {}): Doc {
-  const _conf: ClientConfig = { ...conf };
+  const _conf: Doc = { ...conf };
 
   if (
     _conf.profile ||
@@ -38,10 +38,10 @@ export function deriveConfig(conf: ClientConfig = {}): Doc {
   }
 
   _conf.cache = createCache(_conf);
-  
+
   if (_conf.bucket) {
-    Object.assign(_conf, deriveHostEndpoint(_conf.region, _conf.bucket, _conf.port));
+    Object.assign(_conf, deriveHostEndpoint(_conf));
   }
-  
+
   return _conf;
 }

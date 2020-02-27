@@ -1,3 +1,8 @@
+export {
+  toUint8Array as base64ToUint8Array,
+  fromUint8Array as base64FromUint8Array
+} from "https://deno.land/x/base64@v0.2.0/mod.ts";
+
 export { contentType } from "https://deno.land/std@v0.34.0/media_types/mod.ts";
 
 export {

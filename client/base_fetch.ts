@@ -1,6 +1,6 @@
 import { encode } from "../deps.ts";
 import { HeadersConfig, createHeaders } from "./create_headers.ts";
-import { Doc, opVerbs } from "../util.ts";
+import { Doc, opVerbs, toBuf } from "../util.ts";
 
 /** Base fetch. */
 export async function baseFetch(
@@ -9,9 +9,9 @@ export async function baseFetch(
   params: Doc
 ): Promise<Doc> {
     const httpVerb: string = opVerbs.get(op);
-    
- // TODO: figure out what da payload should be 4 S3
-  const payload: Uint8Array = httpVerb === "GET" ? null : encode("TODO");
+
+  // TODO: assert params.Body is always set if httpVerb !== "GET"
+  const payload: Uint8Array = httpVerb === "GET" ? null : await toBuf(params);
 
   let headers: Headers = await createHeaders(
     httpVerb,
@@ -27,12 +27,12 @@ export async function baseFetch(
     body: payload
   });
 
-  let body: Doc = await response.json();
+  // let body: Doc = await response.json();
 
   if (!response.ok) {
     if (response.status === 403) {
       // retry once with refreshed credenttials
-      headers = await createHeaders(op, payload, conf as HeadersConfig, true);
+      headers = await createHeaders(httpVerb,params.Key, payload, conf as HeadersConfig, true);
 
       response = await fetch(conf.endpoint, {
         method: httpVerb,
@@ -41,14 +41,15 @@ export async function baseFetch(
       });
 
       if (response.ok) {
-        body = await response.json();
+        // body = await response.json();
+        return await response.json();
 
-        return body;
+        // return body;
       }
     }
 
-    throw new Error(body.message);
+    throw new Error(await response.text());
   }
 
-  return body;
+  return await response.json();
 }
