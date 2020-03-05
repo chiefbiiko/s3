@@ -1,6 +1,6 @@
 import { ClientConfig, Credentials } from "../mod.ts";
 import { kdf } from "./aws_signature_v4.ts";
-import { Doc, date } from "../util.ts";
+import { Doc, date as dateUtil } from "../util.ts";
 
 /** Service name. */
 const SERVICE: string = "s3";
@@ -12,21 +12,23 @@ export function createCache(conf: ClientConfig): Doc {
     _signingKey: null,
     _accessKeyId: "",
     _sessionToken: "",
-    async refresh(): Promise<void> {
-      const dateStamp: string = date.format(new Date(), "dateStamp");
+    async refresh(date: Date): Promise<void> {
+      const dateStamp: string = dateUtil.format(date, "dateStamp");
 
       let credentials: Credentials;
 
       if (typeof conf.credentials === "function") {
         credentials = await conf.credentials();
       } else {
-        credentials = conf.credentials;
+        // NOTE: bc conf flew thru deriveConfig .credentials is guaranteed
+        credentials = conf.credentials!;
       }
 
       this._signingKey = kdf(
         credentials.secretAccessKey,
         dateStamp,
-        conf.region,
+        // NOTE: see above
+        conf.region!,
         SERVICE
       ) as Uint8Array;
 

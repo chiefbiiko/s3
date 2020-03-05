@@ -1,22 +1,60 @@
-import { assertEquals } from "https://deno.land/std@v0.34.0/testing/asserts.ts";
-import { createHeaders } from "../client/create_headers.ts";
-import { Doc } from "../util.ts"
+import { assertEquals } from "./deps.ts";
+import { createHeaders, HeadersConfig } from "../client/create_headers.ts";
+import { fixtures } from "./fixtures.ts";
+import { toPojo } from "./util.ts";
 
 Deno.test({
-  name: "createHeaders",
+  name: "GET object createHeaders",
   async fn(): Promise<void> {
-    const expectedSignature: string = "TODO"
+    const { input, expected } = fixtures["GET object createHeaders"];
 
-    const headers: Headers = await createHeaders({
-      // httpVerb: string,
-      // objectKey: string,
-      // payload: Uint8Array,
-      // conf: HeadersConfig,
-      // refreshCredentials: boolean = !conf.cache.signingKey
-    });
+    const actual: Headers = await createHeaders(
+      input.conf,
+      input.refreshCredentials
+    );
 
-    assertEquals(0, 1);
+    assertEquals(toPojo(actual), toPojo(expected));
   }
 });
 
-Deno.runTests();
+Deno.test({
+  name: "PUT object createHeaders",
+  async fn(): Promise<void> {
+    const { input, expected } = fixtures["PUT object createHeaders"];
+
+    const actual: Headers = await createHeaders(
+      input.conf,
+      input.refreshCredentials
+    );
+
+    assertEquals(toPojo(actual), toPojo(expected));
+  }
+});
+
+Deno.test({
+  name: "GET bucket lifecycle",
+  async fn(): Promise<void> {
+    const { input, expected } = fixtures["GET bucket lifecycle"];
+
+    const actual: Headers = await createHeaders(
+      input.conf,
+      input.refreshCredentials
+    );
+
+    assertEquals(toPojo(actual), toPojo(expected));
+  }
+});
+
+Deno.test({
+  name: "GET bucket (list objects)",
+  async fn(): Promise<void> {
+    const { input, expected } = fixtures["GET bucket (list objects)"];
+
+    const actual: Headers = await createHeaders(
+      input.conf,
+      input.refreshCredentials
+    );
+
+    assertEquals(toPojo(actual), toPojo(expected));
+  }
+});

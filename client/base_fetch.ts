@@ -8,18 +8,19 @@ export async function baseFetch(
   op: string,
   params: Doc
 ): Promise<Doc> {
-    const httpVerb: string = opVerbs.get(op);
+    const httpVerb: string = opVerbs.get(op) ?? "";
 
   // TODO: assert params.Body is always set if httpVerb !== "GET"
-  const payload: Uint8Array = httpVerb === "GET" ? null : await toBuf(params);
+  const payload: undefined | Uint8Array =await toBuf(params);
 
-  let headers: Headers = await createHeaders(
+  let headers: Headers = await createHeaders({
+    ...conf,
+    cache: conf.cache,
+    host: conf.host,
     httpVerb,
-    // TODO: check this!!!
-    params.Key,
-    payload,
-    conf as HeadersConfig
-  );
+    objectKey: params.Key,
+    payload
+  });
 
   let response: Response = await fetch(conf.endpoint, {
     method: httpVerb,
@@ -32,7 +33,11 @@ export async function baseFetch(
   if (!response.ok) {
     if (response.status === 403) {
       // retry once with refreshed credenttials
-      headers = await createHeaders(httpVerb,params.Key, payload, conf as HeadersConfig, true);
+      // headers = await createHeaders(httpVerb,params.Key, payload, conf as HeadersConfig, true);
+      headers = await createHeaders({ ...conf,
+        cache: conf.cache,
+        host: conf.host,
+        httpVerb,objectKey:params.Key, payload}, true);
 
       response = await fetch(conf.endpoint, {
         method: httpVerb,

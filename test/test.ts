@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@v0.34.0/testing/asserts.ts";
+import { assertEquals } from "./deps.ts";
 
 import { S3Client, createClient } from "../mod.ts";
 import { Doc } from "../util.ts"
@@ -14,7 +14,7 @@ Deno.test({
       Key: "test_file",
       TODO: "TODO"
     });
-    
+
     assertEquals(0, 1);
   }
 });
@@ -26,7 +26,7 @@ Deno.test({
       // TODO: figure out params - check how key param flows thru da module
       Key: "test_file"
     });
-    
+
     assertEquals(0, 1);
   }
 });

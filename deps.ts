@@ -3,19 +3,19 @@ export {
   fromUint8Array as base64FromUint8Array
 } from "https://deno.land/x/base64@v0.2.0/mod.ts";
 
-export { contentType } from "https://deno.land/std@v0.34.0/media_types/mod.ts";
+export { contentType } from "https://deno.land/std@v0.35.0/media_types/mod.ts";
 
 export {
   encode,
   decode
 } from "https://denopkg.com/chiefbiiko/std-encoding@v1.0.0/mod.ts";
 
-export { extname } from "https://deno.land/std@v0.34.0/path/mod.ts";
+export { extname } from "https://deno.land/std@v0.35.0/path/mod.ts";
 
 export {
   get
-} from "https://denopkg.com/chiefbiiko/get-aws-config@v0.3.4/mod.ts";
+} from "https://denopkg.com/chiefbiiko/get-aws-config@v0.3.5/mod.ts";
 
-export { hmac } from "https://denopkg.com/chiefbiiko/hmac@v1.0.1/mod.ts";
+export { hmac } from "https://denopkg.com/chiefbiiko/hmac@v1.0.2/mod.ts";
 
-export { sha256 } from "https://denopkg.com/chiefbiiko/sha256@v1.0.0/mod.ts";
+export { sha256 } from "https://denopkg.com/chiefbiiko/sha256@v1.0.2/mod.ts";

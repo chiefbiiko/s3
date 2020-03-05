@@ -7,7 +7,8 @@ const ANY_BUT_DIGITS_T: RegExp = /[^\dT]/g;
 /** Maps S3 operations to their corresponding HTTP verbs. */
 export const opVerbs: Map<string, string> = new Map<string, string>([
   ["PutObject", "PUT"],
-  ["GetObject", "GET"]
+  ["GetObject", "GET"],
+  ["GetBucketLifecycleConfiguration", "GET"]
 ]);
 
 /** Generic document. */
@@ -25,9 +26,8 @@ export function camelCase(text: string): string {
 
 /** Derives host and endpoint. */
 export function deriveHostEndpoint({
-  region,
   bucket,
-  host = `${bucket}.s3.${region}.amazonaws.com`,
+  host = `${bucket}.s3.amazonaws.com`,
   port = 443,
   endpoint = `https://${host}:${port}/`
 }: ClientConfig): { host: string; endpoint: string } {
@@ -43,7 +43,7 @@ export function deriveHostEndpoint({
  *   + maybe allow "file://..." urls
  *   + allow passing readable streams
  */
-export async function toBuf({Body = "", BodyEncoding = "utf8"}: Doc): Promise<Uint8Array> {
+export async function toBuf({Body = "", BodyEncoding = "utf8"}: Doc): Promise<undefined | Uint8Array> {
   if (Body instanceof Uint8Array) {
   return Body
   }
@@ -186,12 +186,13 @@ const memberTypeToSetType: Doc = {
 /** DynamoDB set type. */
 export class DynamoDBSet {
   readonly wrappername: string = "Set";
-  readonly values: any[];
+  readonly values: any[] = [];
   readonly type: string;
 
   /** Creates a dynamodb set. */
   constructor(list: any[] = [], options: Doc = {}) {
-    this.values = [].concat(list);
+    // this.values = [].concat(list);
+    Array.prototype.push.apply(this.values, list);
 
     this.type = memberTypeToSetType[typeOf(this.values[0])];
 
