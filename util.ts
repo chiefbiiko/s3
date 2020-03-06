@@ -1,11 +1,21 @@
 import { encode} from "./deps.ts"
 import {ClientConfig} from "./mod.ts";
 
+/** Matches anything but digits. */
 const ANY_BUT_DIGITS: RegExp = /[^\d]/g;
+
+/** Matches anything but digits and capital T. */
 const ANY_BUT_DIGITS_T: RegExp = /[^\dT]/g;
 
+/** Matches the question mark leading a query string. */
+const LEADING_QUESTIONMARK_PATTERN: RegExp = /^\?/;
+
+/** Matches the root slash of a object key. */
+const LEADING_SLASH_PATTERN: RegExp = /^\//;
+
 /** Maps S3 operations to their corresponding HTTP verbs. */
-export const opVerbs: Map<string, string> = new Map<string, string>([
+export const OPS_HTTP_VERBS: Map<string, string> = new Map<string, string>([
+  ["CreateBucket", "TODO"],
   ["PutObject", "PUT"],
   ["GetObject", "GET"],
   ["GetBucketLifecycleConfiguration", "GET"]
@@ -32,6 +42,46 @@ export function deriveHostEndpoint({
   endpoint = `https://${host}:${port}/`
 }: ClientConfig): { host: string; endpoint: string } {
   return { host, endpoint };
+}
+
+/** Sorts and concats given headers to aws canonical and signed headers. */
+export function sortConcatHeaders(headers: { [key: string]: string }): { canonicalHeaders: string, signedHeaders: string } {
+  const sorted: string[] = Object.keys(headers)
+    // NOTE: not mapping headers that have an undefined value - fx
+    // x-amz-security-token - is optional
+    .filter((headerKey: string): boolean => !!headers[headerKey])
+    .sort((a: string, b: string): number =>
+      a.toLowerCase().localeCompare(b.toLowerCase()));
+
+  // console.error(">>>>>>> sorted", sorted);
+
+  const canonicalHeaders: string = sorted
+    .reduce((acc: string, headerKey: string): string =>
+      `${acc}${headerKey.toLowerCase()}:${headers[headerKey]}\n`, "");
+
+  const signedHeaders: string = sorted
+    .map((headerKey: string): string => headerKey.toLowerCase())
+    .join(";");
+
+  return { canonicalHeaders, signedHeaders };
+}
+
+/** Convers a query string to its canonical form. */
+export function toCanonicalQueryString(queryString: string): string {
+  return queryString
+    .replace(LEADING_QUESTIONMARK_PATTERN, "")
+    .split("&")
+    // NOTE: if kv is present and not a proper kv pair append =("")
+    .map((kv: string): string => !kv.trim() || kv.includes("=") ? kv : `${kv}=`)
+    .join("&");
+}
+
+/** Transforms an object key to a canonical uri. */
+export function toCanonicalUri(objectKey: string): string {
+  // const canonicalUri: string = objectKey.startsWith("/") ? objectKey : `/${objectKey}`
+  const cut: string = objectKey.replace(LEADING_SLASH_PATTERN, "");
+
+  return `/${encodeURIComponent(cut)}`
 }
 
 /**

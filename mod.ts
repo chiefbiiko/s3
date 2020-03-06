@@ -1,5 +1,5 @@
 import { baseOp, deriveConfig } from "./client/mod.ts";
-import { Doc, camelCase } from "./util.ts";
+import { Doc, camelCase, OPS_HTTP_VERBS } from "./util.ts";
 
 // TODO:
 // + add a changelog that integrates with `git tag -a`
@@ -37,21 +37,14 @@ export interface ClientConfig {
   endpoint?: string; // https://yo-bucket.s3.us-east-1.amazonaws.com:443
 }
 
-/** S3 operations. */
-export const OPS: Set<string> = new Set<string>([
-  "CreateBucket",
-  "GetObject",
-  "PutObject"
-]);
-
 /** Creates a S3 client. */
 export function createClient(conf?: ClientConfig): S3Client {
   const _conf: Doc = deriveConfig(conf);
 
   const s3: S3Client = {} as S3Client;
 
-  for (const op of OPS) {
-    s3[camelCase(op)] = baseOp.bind(null, _conf, op);
+  for (const [op, httpVerb] of OPS_HTTP_VERBS.entries()) {
+    s3[camelCase(op)] = baseOp.bind(null, _conf, op, httpVerb);
   }
 
   return s3;

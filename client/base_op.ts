@@ -26,13 +26,15 @@ export const NO_PARAMS_OPS: Set<string> = new Set<string>([
 export async function baseOp(
   conf: ClientConfig,
   op: string,
+  httpVerb: string,
   params: Doc = {},
   {
     wrapNumbers = false,
     convertEmptyValues = false,
-    translateJSON = true
+    translateJSON = false
   }: OpOptions = NO_PARAMS_OPS.has(op) ? params || {} : {}
 ): Promise<Doc> {
+  // TODO: doo this once in the factory
   let _conf: ClientConfig = {...conf}
 
   if (params.Bucket) {
@@ -43,6 +45,8 @@ export async function baseOp(
       port: conf.port,
       endpoint: conf.endpoint
     }))
+  } else if (!_conf.host || !_conf.endpoint) {
+    throw new Error("undefined host/endpoint");
   }
 
   // return baseFetch(_conf, op, params);
@@ -64,7 +68,7 @@ export async function baseOp(
     params = { ...params };
   }
 
-  let rawResult: Doc = await baseFetch(conf, op, params);
+  let rawResult: Doc = await baseFetch(_conf, httpVerb, params);
 
   if (!translateJSON) {
     return rawResult;

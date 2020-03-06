@@ -10,23 +10,24 @@ Deno.test({
   name: "PutObject",
   async fn(): Promise<void> {
     const result: Doc = await s3.putObject({
-      // TODO: figure out params - check how key param flows thru da module
-      Key: "test_file",
-      TODO: "TODO"
+      Key: "kitchen",
+      Body: "microwave stories"
     });
 
-    assertEquals(0, 1);
+    console.error(">>>>>>> result");
+    console.error(result);
+
+    // assertEquals(0, 1);
   }
 });
 
-Deno.test({
-  name: "GetObject",
-  async fn(): Promise<void> {
-    const result: Doc = await s3.getObject({
-      // TODO: figure out params - check how key param flows thru da module
-      Key: "test_file"
-    });
-
-    assertEquals(0, 1);
-  }
-});
+// Deno.test({
+//   name: "GetObject",
+//   async fn(): Promise<void> {
+//     const result: Doc = await s3.getObject({
+//       Key: "test_file"
+//     });
+//
+//     assertEquals(0, 1);
+//   }
+// });

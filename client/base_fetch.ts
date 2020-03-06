@@ -1,17 +1,20 @@
-import { encode } from "../deps.ts";
-import { HeadersConfig, createHeaders } from "./create_headers.ts";
-import { Doc, opVerbs, toBuf } from "../util.ts";
+// import { encode } from "../deps.ts";
+import { createHeaders } from "./create_headers.ts";
+import { Doc, toBuf } from "../util.ts";
 
 /** Base fetch. */
 export async function baseFetch(
   conf: Doc,
-  op: string,
+  // op: string,
+  httpVerb: string,
   params: Doc
 ): Promise<Doc> {
-    const httpVerb: string = opVerbs.get(op) ?? "";
+    // const httpVerb: string = OPS_HTTP_VERBS.get(op) ?? "";
 
   // TODO: assert params.Body is always set if httpVerb !== "GET"
   const payload: undefined | Uint8Array =await toBuf(params);
+
+  // console.error(">>>>>> payload as utf8", new TextDecoder().decode(payload));
 
   let headers: Headers = await createHeaders({
     ...conf,
@@ -21,6 +24,10 @@ export async function baseFetch(
     objectKey: params.Key,
     payload
   });
+
+  // console.error(">>>>>>> payload", payload);
+  // console.error(">>>>>>> headers", JSON.stringify(Object.fromEntries(headers.entries()), null, 2));
+  // console.error(">>>>>>> conf", JSON.stringify(conf, null, 2));
 
   let response: Response = await fetch(conf.endpoint, {
     method: httpVerb,

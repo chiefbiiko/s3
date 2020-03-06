@@ -1,7 +1,12 @@
 import { assertEquals } from "./deps.ts";
 import { createHeaders, HeadersConfig } from "../client/create_headers.ts";
 import { fixtures } from "./fixtures.ts";
-import { toPojo } from "./util.ts";
+import { Doc } from "../util.ts";
+
+/** Maps Headers to an object. */
+export function toPojo(headers: Headers): Doc {
+  return Object.fromEntries(headers.entries());
+}
 
 Deno.test({
   name: "GET object createHeaders",

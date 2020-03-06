@@ -1,6 +1,6 @@
 import { sha256, encode } from "../deps.ts";
 import { awsSignatureV4 } from "./aws_signature_v4.ts";
-import { Doc, date as dateUtil } from "../util.ts";
+import { Doc, date as dateUtil, sortConcatHeaders, toCanonicalUri, toCanonicalQueryString } from "../util.ts";
 import { ClientConfig } from "../mod.ts";
 
 /** Algorithm identifer. */
@@ -8,12 +8,6 @@ const ALGORITHM: string = "AWS4-HMAC-SHA256";
 
 /** zero-bytes SHA256. */
 const ZERO_BYTES_SHA256_HEX: string = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
-
-/** Matches the question mark leading a query string. */
-const LEADING_QUESTIONMARK_PATTERN: RegExp = /^\?/;
-
-/** Matches the root slash of a object key. */
-const LEADING_SLASH_PATTERN: RegExp = /^\//;
 
 // /** Content type header value for POST requests. */
 // const CONTENT_TYPE: string = "application/x-amz-json-1.0";
@@ -28,46 +22,6 @@ export interface HeadersConfig extends ClientConfig {
   objectKey?: string;
   payload?: Uint8Array,
   queryString?: string
-}
-
-/** Sorts and concats given headers to aws canonical and signed headers. */
-function sortConcatHeaders(headers: { [key: string]: string }): { canonicalHeaders: string, signedHeaders: string } {
-  const sorted: string[] = Object.keys(headers)
-    // NOTE: not mapping headers that have an undefined value - fx
-    // x-amz-security-token - is optional
-    .filter((headerKey: string): boolean => !!headers[headerKey])
-    .sort((a: string, b: string): number =>
-      a.toLowerCase().localeCompare(b.toLowerCase()));
-
-  console.error(">>>>>>> sorted", sorted);
-
-  const canonicalHeaders: string = sorted
-    .reduce((acc: string, headerKey: string): string =>
-      `${acc}${headerKey.toLowerCase()}:${headers[headerKey]}\n`, "");
-
-  const signedHeaders: string = sorted
-    .map((headerKey: string): string => headerKey.toLowerCase())
-    .join(";");
-
-  return { canonicalHeaders, signedHeaders };
-}
-
-/** Convers a query string to its canonical form. */
-function toCanonicalQueryString(queryString: string): string {
-  return queryString
-    .replace(LEADING_QUESTIONMARK_PATTERN, "")
-    .split("&")
-    // NOTE: if kv is present and not a proper kv pair append =("")
-    .map((kv: string): string => !kv.trim() || kv.includes("=") ? kv : `${kv}=`)
-    .join("&");
-}
-
-/** Transforms an object key to a canonical uri. */
-function toCanonicalUri(objectKey: string): string {
-  // const canonicalUri: string = objectKey.startsWith("/") ? objectKey : `/${objectKey}`
-  const cut: string = objectKey.replace(LEADING_SLASH_PATTERN, "");
-
-  return `/${encodeURIComponent(cut)}`
 }
 
 /** Assembles a header object for a DynamoDB request. */
@@ -136,7 +90,7 @@ export async function createHeaders(
 
   const canonicalRequest: string = `${httpVerb}\n${canonicalUri}\n${canonicalQueryString}\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
 
-  console.error(">>>>>>> canonicalRequest\n", canonicalRequest);
+  // console.error(">>>>>>> canonicalRequest\n", canonicalRequest);
 
   const canonicalRequestDigest: string = sha256(
     canonicalRequest,
@@ -164,6 +118,8 @@ export async function createHeaders(
   }
 
   rawHeaders.authorization = authorizationHeaderValue;
+
+  console.error(">>>>>>> rawHeaders", JSON.stringify(rawHeaders, null, 2));
 
   return new Headers(rawHeaders)
 
