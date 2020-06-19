@@ -1,4 +1,4 @@
-import { sha256, encode } from "../deps.ts";
+import { contentType, sha256, encode, extname } from "../deps.ts";
 import { awsSignatureV4 } from "./aws_signature_v4.ts";
 import { Doc, date as dateUtil, sortConcatHeaders, toCanonicalUri, toCanonicalQueryString } from "../util.ts";
 import { ClientConfig } from "../mod.ts";
@@ -46,12 +46,9 @@ export async function createHeaders(
   if (refreshCredentials) {
     await cache.refresh(date);
   }
-
+  
   const amzDate: string = dateUtil.format(date, "amz");
 
-  // const canonicalUri: string = objectKey; // "/" + objectKey;
-  // TODO: uri-encode!
-  // const canonicalUri: string = objectKey.startsWith("/") ? objectKey : `/${objectKey}`
   const canonicalUri: string = toCanonicalUri(objectKey);
 
   const canonicalQueryString: string = toCanonicalQueryString(queryString);
@@ -61,17 +58,26 @@ export async function createHeaders(
   const rawHeaders: {[key:string]:string} = {
     ...extraHeaders,
     host,
-    "x-amz-security-token": cache.sessionToken,
-    // "Content-Type": CONTENT_TYPE,
+    // "x-amz-security-token": cache.sessionToken,
     "x-amz-date": amzDate,
     // Authorization: authorizationHeader,
     // NOTE: 4 chunked uploads the X-Amz-Content-Sha256 header should be set to
     // "STREAMING-AWS4-HMAC-SHA256-PAYLOAD"
     "x-amz-content-sha256": payloadHash
   }
+  
+  if (cache.sessionToken) {
+    rawHeaders["x-amz-security-token"] = cache.sessionToken
+  }
+  
+    //  add and map content-type to canonicalHeaders and signedHeaders
+  const ctype: undefined |string  = contentType(extname(objectKey));
+  
+  if (ctype) {
+    rawHeaders["content-type"] = ctype;
+  }
 
   // TODO: sort and concat std + extra headerswith a func
-  // TODO: add and map content-type to canonicalHeaders and signedHeaders
   const { signedHeaders, canonicalHeaders } = sortConcatHeaders(rawHeaders);
   // let canonicalHeaders: string = "";
   // let signedHeaders: string = "";
@@ -90,7 +96,7 @@ export async function createHeaders(
 
   const canonicalRequest: string = `${httpVerb}\n${canonicalUri}\n${canonicalQueryString}\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
 
-  // console.error(">>>>>>> canonicalRequest\n", canonicalRequest);
+  console.debug(">>>>>>> canonicalRequest\n", canonicalRequest);
 
   const canonicalRequestDigest: string = sha256(
     canonicalRequest,
@@ -111,11 +117,11 @@ export async function createHeaders(
 
   const authorizationHeaderValue: string = `${ALGORITHM} Credential=${cache.accessKeyId}/${cache.credentialScope},SignedHeaders=${signedHeaders},Signature=${signature}`;
 
-  if (!rawHeaders["x-amz-security-token"]) {
-    // NOTE: if the session token is undefined deleting, otherwise we wld end up
-    // with a string header value "undefined"
-    delete rawHeaders["x-amz-security-token"]
-  }
+  // if (!rawHeaders["x-amz-security-token"]) {
+  //   // NOTE: if the session token is undefined deleting, otherwise we wld end up
+  //   // with a string header value "undefined"
+  //   delete rawHeaders["x-amz-security-token"]
+  // }
 
   rawHeaders.authorization = authorizationHeaderValue;
 

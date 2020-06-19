@@ -67,6 +67,8 @@ export async function baseOp(
   } else {
     params = { ...params };
   }
+  
+  console.debug("base_op params", params);
 
   let rawResult: Doc = await baseFetch(_conf, httpVerb, params);
 

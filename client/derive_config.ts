@@ -33,7 +33,9 @@ export function deriveConfig(conf: ClientConfig = {}): Doc {
 
     if (
       typeof _conf.credentials !== "function" &&
-      (!_conf.credentials.accessKeyId || !_conf.credentials.secretAccessKey)
+      (!_conf.region ||
+        !_conf.credentials.accessKeyId ||
+        !_conf.credentials.secretAccessKey)
     ) {
       throw new Error("unable to derive aws credentials");
     }
