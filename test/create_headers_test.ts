@@ -4,7 +4,7 @@ import { fixtures } from "./fixtures.ts";
 import { Doc } from "../util.ts";
 
 /** Maps Headers to an object. */
-export function toPojo(headers: Headers): Doc {
+function toPojo(headers: Headers): Doc {
   return Object.fromEntries(headers.entries());
 }
 
