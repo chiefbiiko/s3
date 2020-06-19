@@ -3,18 +3,21 @@ import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
 import { S3Client, createClient } from "../mod.ts";
 
 // TODO: create the bucket from within here once that is impld
-const s3: S3Client = createClient({ bucket: Deno.env().BUCKET_NAME });
+const s3: S3Client = createClient({
+  profile: Deno.env.get("AWS_PROFILE"),
+  bucket: Deno.env.get("BUCKET_NAME"),
+});
 
 Deno.test({
   name: "PutObject",
   async fn(): Promise<void> {
     const result = await s3.putObject({
-      Key: "bendo/kitchen",
-      Body: "chickens"
+      Key: "bendo/kitchen.json",
+      Body: '{"microwave":"stories"}',
     });
 
     console.error(">>>>>>> result\n", result);
-  }
+  },
 });
 
 // Deno.test({
