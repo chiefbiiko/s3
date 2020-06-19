@@ -1,5 +1,5 @@
-import { encode} from "./deps.ts"
-import {ClientConfig} from "./mod.ts";
+import { encode } from "./deps.ts";
+import { ClientConfig } from "./mod.ts";
 
 /** Matches anything but digits. */
 const ANY_BUT_DIGITS: RegExp = /[^\d]/g;
@@ -18,7 +18,7 @@ export const OPS_HTTP_VERBS: Map<string, string> = new Map<string, string>([
   ["CreateBucket", "TODO"],
   ["PutObject", "PUT"],
   ["GetObject", "GET"],
-  ["GetBucketLifecycleConfiguration", "GET"]
+  ["GetBucketLifecycleConfiguration", "GET"],
 ]);
 
 /** Generic document. */
@@ -39,25 +39,31 @@ export function deriveHostEndpoint({
   bucket,
   host = `${bucket}.s3.amazonaws.com`,
   port = 443,
-  endpoint = `https://${host}:${port}/`
+  endpoint = `https://${host}:${port}/`,
 }: ClientConfig): { host: string; endpoint: string } {
   return { host, endpoint };
 }
 
 /** Sorts and concats given headers to aws canonical and signed headers. */
-export function sortConcatHeaders(headers: { [key: string]: string }): { canonicalHeaders: string, signedHeaders: string } {
+export function sortConcatHeaders(
+  headers: { [key: string]: string },
+): { canonicalHeaders: string; signedHeaders: string } {
   const sorted: string[] = Object.keys(headers)
     // NOTE: not mapping headers that have an undefined value - fx
     // x-amz-security-token - is optional
     .filter((headerKey: string): boolean => !!headers[headerKey])
     .sort((a: string, b: string): number =>
-      a.toLowerCase().localeCompare(b.toLowerCase()));
+      a.toLowerCase().localeCompare(b.toLowerCase())
+    );
 
   // console.error(">>>>>>> sorted", sorted);
 
   const canonicalHeaders: string = sorted
-    .reduce((acc: string, headerKey: string): string =>
-      `${acc}${headerKey.toLowerCase()}:${headers[headerKey]}\n`, "");
+    .reduce(
+      (acc: string, headerKey: string): string =>
+        `${acc}${headerKey.toLowerCase()}:${headers[headerKey]}\n`,
+      "",
+    );
 
   const signedHeaders: string = sorted
     .map((headerKey: string): string => headerKey.toLowerCase())
@@ -78,10 +84,10 @@ export function toCanonicalQueryString(queryString: string): string {
 
 /** Transforms an object key to a canonical uri. */
 export function toCanonicalUri(objectKey: string): string {
-  // const canonicalUri: string = objectKey.startsWith("/") ? objectKey : `/${objectKey}`
-  const cut: string = objectKey.replace(LEADING_SLASH_PATTERN, "");
-
-  return `/${encodeURIComponent(cut)}`
+  return objectKey.startsWith("/") ? objectKey : `/${objectKey}`;
+  // const cut: string = objectKey.replace(LEADING_SLASH_PATTERN, "");
+  //
+  // return `/${encodeURIComponent(cut)}`
 }
 
 /**
@@ -93,9 +99,11 @@ export function toCanonicalUri(objectKey: string): string {
  *   + maybe allow "file://..." urls
  *   + allow passing readable streams
  */
-export async function toBuf({Body = "", BodyEncoding = "utf8"}: Doc): Promise<undefined | Uint8Array> {
+export async function toPayload(
+  { Body = "", BodyEncoding = "utf8" }: Doc,
+): Promise<undefined | Uint8Array> {
   if (Body instanceof Uint8Array) {
-  return Body
+    return Body;
   }
 
   if (typeof Body === "string") {
@@ -103,11 +111,11 @@ export async function toBuf({Body = "", BodyEncoding = "utf8"}: Doc): Promise<un
   }
 
   if ("readSync" in Body) {
-    return Deno.readAllSync(Body)
+    return Deno.readAllSync(Body);
   }
 
   if ("read" in Body) {
-    return Deno.readAll(Body)
+    return Deno.readAll(Body);
   }
 }
 
@@ -117,11 +125,11 @@ export function property(
   name: string,
   value: any,
   enumerable?: boolean,
-  isValue?: boolean
+  isValue?: boolean,
 ): void {
   const opts: Doc = {
     configurable: true,
-    enumerable: typeof enumerable === "boolean" ? enumerable : true
+    enumerable: typeof enumerable === "boolean" ? enumerable : true,
   };
 
   if (typeof value === "function" && !isValue) {
@@ -139,7 +147,7 @@ export function memoizedProperty(
   obj: any,
   name: string,
   get: () => any,
-  enumerable?: boolean
+  enumerable?: boolean,
 ): void {
   let cachedValue: any = null;
 
@@ -154,7 +162,7 @@ export function memoizedProperty(
 
       return cachedValue;
     },
-    enumerable
+    enumerable,
   );
 }
 
@@ -191,7 +199,7 @@ function isBinary(data: any): boolean {
     "Int32Array",
     "Uint32Array",
     "Float32Array",
-    "Float64Array"
+    "Float64Array",
   ];
 
   // if (util.isNode()) {
@@ -218,7 +226,7 @@ function isBinary(data: any): boolean {
     //
     // }
     return types.some(
-      (type: string): boolean => data.constructor.name === type
+      (type: string): boolean => data.constructor.name === type,
     );
   }
 
@@ -230,7 +238,7 @@ const memberTypeToSetType: Doc = {
   String: "String",
   Number: "Number",
   NumberValue: "Number",
-  Binary: "Binary"
+  Binary: "Binary",
 };
 
 /** DynamoDB set type. */
@@ -248,7 +256,7 @@ export class DynamoDBSet {
 
     if (!this.type) {
       throw new Error(
-        "DynamoDB sets can only contain string, number, or binary values"
+        "DynamoDB sets can only contain string, number, or binary values",
       );
     }
 
@@ -305,10 +313,12 @@ export const date: Doc = {
   /** Date stamp format as expected by awsSignatureV4KDF. */
   DATE_STAMP_REGEX: /^\d{8}$/,
   amz(date: Date): string {
-    return `${date
-      .toISOString()
-      .slice(0, 19)
-      .replace(ANY_BUT_DIGITS_T, "")}Z`;
+    return `${
+      date
+        .toISOString()
+        .slice(0, 19)
+        .replace(ANY_BUT_DIGITS_T, "")
+    }Z`;
   },
   dateStamp(date: Date): string {
     return date
@@ -352,5 +362,5 @@ export const date: Doc = {
     } else {
       throw new Error(`unhandled timestamp format: ${value}`);
     }
-  }
+  },
 };
