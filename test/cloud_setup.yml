@@ -14,7 +14,9 @@ Resources:
               - Sid: AllowFullAccessOnTestingBucket
                 Effect: Allow
                 Action: s3:*
-                Resource: !GetAtt Bucket.Arn
+                Resource:
+                  - !Sub arn:aws:s3:::${Bucket}
+                  - !Sub arn:aws:s3:::${Bucket}/*
   AccessKey:
     Type: AWS::IAM::AccessKey
     Properties:
