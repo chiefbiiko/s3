@@ -35,6 +35,7 @@ export interface ClientConfig {
   host?: string; // yo-bucket.s3.us-east-1.amazonaws.com
   port?: number; // 443
   endpoint?: string; // https://yo-bucket.s3.us-east-1.amazonaws.com:443
+  retry?: boolean; // retry a failing command once on a 403 response?
 }
 
 /** Creates a S3 client. */

@@ -5,7 +5,7 @@ import {ClientConfig} from "../mod.ts";
 
 /** Derives an internal config object from a ClientConfig. */
 export function deriveConfig(conf: ClientConfig = {}): Doc {
-  const _conf: Doc = { ...conf };
+  const _conf: Doc = { retry: true, ...conf };
 
   if (
     _conf.profile ||

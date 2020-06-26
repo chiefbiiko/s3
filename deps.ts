@@ -19,3 +19,5 @@ export {
 export { hmac } from "https://denopkg.com/chiefbiiko/hmac@v1.0.2/mod.ts";
 
 export { sha256 } from "https://denopkg.com/chiefbiiko/sha256@v1.0.2/mod.ts";
+
+export { md5 } from "https://denopkg.com/chiefbiiko/md5@v0.1.0/mod.ts";

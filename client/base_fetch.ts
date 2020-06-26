@@ -36,7 +36,7 @@ export async function baseFetch(
   // let body: Doc = await response.json();
 
   if (!response.ok) {
-    if (response.status === 403) {
+    if (response.status === 403 && conf.retry) {
       // retry once with refreshed credenttials
       // headers = await createHeaders(httpVerb,params.Key, payload, conf as HeadersConfig, true);
       headers = await createHeaders({ ...conf,

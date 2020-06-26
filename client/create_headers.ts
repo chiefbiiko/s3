@@ -1,4 +1,4 @@
-import { contentType, sha256, encode, extname } from "../deps.ts";
+import { contentType, sha256, encode, extname, md5 } from "../deps.ts";
 import { awsSignatureV4 } from "./aws_signature_v4.ts";
 import { Doc, date as dateUtil, sortConcatHeaders, toCanonicalUri, toCanonicalQueryString } from "../util.ts";
 import { ClientConfig } from "../mod.ts";
@@ -53,18 +53,31 @@ export async function createHeaders(
 
   const canonicalQueryString: string = toCanonicalQueryString(queryString);
 
-  const payloadHash: string = !payload ? ZERO_BYTES_SHA256_HEX : sha256(payload, null!, "hex") as string;
+  // const payloadHash: string = !payload ? ZERO_BYTES_SHA256_HEX : sha256(payload, null!, "hex") as string;
 
   const rawHeaders: {[key:string]:string} = {
     ...extraHeaders,
+    "content-length": `${payload?.byteLength ?? 0}`,
     host,
     // "x-amz-security-token": cache.sessionToken,
     "x-amz-date": amzDate,
     // Authorization: authorizationHeader,
     // NOTE: 4 chunked uploads the X-Amz-Content-Sha256 header should be set to
     // "STREAMING-AWS4-HMAC-SHA256-PAYLOAD"
-    "x-amz-content-sha256": payloadHash
+    // "x-amz-content-sha256": payloadHash
   }
+  
+  let payloadSha256Hex: string;
+  
+  if (payload) {
+    payloadSha256Hex = sha256(payload, undefined, "hex") as string;
+    
+    rawHeaders["content-md5"] = md5(payload.toString(), undefined, "base64") as string;
+  } else {
+    payloadSha256Hex = ZERO_BYTES_SHA256_HEX;
+  }
+  
+  rawHeaders["x-amz-content-sha256"] = payloadSha256Hex;
   
   if (cache.sessionToken) {
     rawHeaders["x-amz-security-token"] = cache.sessionToken
@@ -94,7 +107,7 @@ export async function createHeaders(
 
   // const signedHeaders: string = "host;x-amz-content-sha256;x-amz-date";
 
-  const canonicalRequest: string = `${httpVerb}\n${canonicalUri}\n${canonicalQueryString}\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
+  const canonicalRequest: string = `${httpVerb}\n${canonicalUri}\n${canonicalQueryString}\n${canonicalHeaders}\n${signedHeaders}\n${payloadSha256Hex}`;
 
   console.debug(">>>>>>> canonicalRequest\n", canonicalRequest);
 

@@ -4,8 +4,8 @@ import { S3Client, createClient } from "../mod.ts";
 
 // TODO: create the bucket from within here once that is impld
 const s3: S3Client = createClient({
-  profile: Deno.env.get("AWS_PROFILE"),
   bucket: Deno.env.get("BUCKET_NAME"),
+  retry: false
 });
 
 Deno.test({
