@@ -88,6 +88,7 @@ export function toCanonicalUri(objectKey: string): string {
   const cut: string = objectKey.replace(LEADING_SLASH_PATTERN, "");
   
   return `/${encodeURIComponent(cut)}`
+  // return encodeURIComponent(objectKey);
 }
 
 /**

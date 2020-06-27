@@ -117,16 +117,25 @@ export async function createHeaders(
     "hex"
   ) as string;
 
+console.error("$$$$$$$$$$$$$$$$$$$$ amzDate", amzDate)
+console.error("$$$$$$$$$$$$$$$$$$$$ credentialScope", cache.credentialScope)
+console.error("$$$$$$$$$$$$$$$$$$$$ canonicalRequestDigest", canonicalRequestDigest)
+
   const msg: Uint8Array = encode(
     `${ALGORITHM}\n${amzDate}\n${cache.credentialScope}\n${canonicalRequestDigest}`,
     "utf8"
   );
+  
+  console.error("$$$$$$$$$$$$$$$$$$ signingKey", cache.signingKey)
+  console.error("$$$$$$$$$$$$$$$$$$ msg", msg)
 
   const signature: string = awsSignatureV4(
     cache.signingKey,
     msg,
     "hex"
   ) as string;
+
+  console.error("$$$$$$$$$$$$$$$$$ signature", signature)
 
   const authorizationHeaderValue: string = `${ALGORITHM} Credential=${cache.accessKeyId}/${cache.credentialScope},SignedHeaders=${signedHeaders},Signature=${signature}`;
 
