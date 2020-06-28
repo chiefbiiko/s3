@@ -33,13 +33,13 @@ export async function baseOp(
     convertEmptyValues = false,
     translateJSON = false
   }: OpOptions = NO_PARAMS_OPS.has(op) ? params || {} : {}
-): Promise<Doc> {
+): Promise<undefined | Doc> {
   // TODO: how to avoid shared state more efficently?
   let _conf: ClientConfig = {...conf}
 
-  if (params.Bucket) {
+  if (params.Bucket ||params.bucket) {
     Object.assign(_conf, deriveHostEndpoint({
-      bucket: params.Bucket,
+      bucket: params.Bucket ||params.bucket,
       host: conf.host,
       port: conf.port,
       endpoint: conf.endpoint
@@ -67,7 +67,7 @@ export async function baseOp(
     params = { ...params };
   }
 
-  let rawResult: Doc = await baseFetch(_conf, httpVerb, params);
+  let rawResult: undefined | Doc = await baseFetch(_conf, httpVerb, params);
 
   if (!translateJSON) {
     return rawResult;

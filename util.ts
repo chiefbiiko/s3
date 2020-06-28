@@ -15,7 +15,8 @@ const LEADING_SLASH_PATTERN: RegExp = /^\//;
 
 /** Maps S3 operations to their corresponding HTTP verbs. */
 export const OPS_HTTP_VERBS: Map<string, string> = new Map<string, string>([
-  ["CreateBucket", "TODO"],
+  ["CreateBucket", "PUT"],
+  ["DeleteBucket", "DELETE"],
   ["PutObject", "PUT"],
   ["GetObject", "GET"],
   ["GetBucketLifecycleConfiguration", "GET"],
@@ -82,7 +83,7 @@ export function toCanonicalQueryString(queryString: string): string {
     .join("&");
 }
 
-export function stripLeadingSlash(objectKey: string): string {
+export function stripLeadingSlash(objectKey: string = ""): string {
   return objectKey.replace(LEADING_SLASH_PATTERN, "");
 }
 
@@ -96,8 +97,6 @@ export function toCanonicalUri(objectKey: string): string {
 
 /**
  * Coerces anything to an Uint8Array.
- *
- * If the body is a string it must be utf8 encoded.
  *
  * TODO:
  *   + maybe allow "file://..." urls
@@ -121,6 +120,55 @@ export async function toPayload(
   if ("read" in Body) {
     return Deno.readAll(Body);
   }
+}
+
+// /** Whether given buffer is perfectly printable. */
+// function allPrintable(buf: Uint8Array): boolean {
+//   return buf.every((byte: number): boolean => byte >31 && byte < 128)
+// }
+
+/** Parses a S3 response payload. */
+export async function parsePayload(response: Response): Promise<undefined | Doc> {
+  const contentLength: number = Number(response.headers.get("content-length")) || 0;
+  
+  if (contentLength > 0) {
+    try {
+      const doc: Doc = await  response.json();
+      
+      return doc;
+    } catch(err) {
+      console.error("$$$$$$$$$$$$$$$$$$$$ parse err")
+      console.debug(err.stack);
+      
+      return {data: new Uint8Array(await response.arrayBuffer())};
+    }
+  }
+  
+  // try {
+  //   const doc: Doc = await  response.json();
+  // 
+  //   return doc;
+  // } catch(err) {
+  //   console.error("$$$$$$$$$$$$$$$$$$$$ parse err")
+  //   console.debug(err.stack);
+  // 
+  //   return {data: new Uint8Array(await response.arrayBuffer())};
+  // }
+  // const ctype: null | string = response.headers.get("content-type");
+  // 
+  // if (ctype?.includes("json")) {
+  //   return response.json()
+  // } else if (ctype?.startsWith("text")) {
+  //   return response.text()
+  // }
+  // 
+  // const buf: Uint8Array = new Uint8Array(await response.arrayBuffer());
+  // 
+  // if (allPrintable(buf)) {
+  //   return response.text()
+  // }
+  // 
+  // return buf
 }
 
 /** Defines a property. */

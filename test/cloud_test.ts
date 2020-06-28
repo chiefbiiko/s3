@@ -2,27 +2,40 @@ import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
 
 import { S3Client, createClient } from "../mod.ts";
 
-// TODO: create the bucket from within here once that is impld
-const s3: S3Client = createClient({ bucket: Deno.env.get("BUCKET_NAME") });
+import { Doc} from "../util.ts"
+
+const BUCKET_NAME: string = Deno.env.get("BUCKET_NAME") || "s3testingstack-bucket-419";
+
+const s3: S3Client = createClient({ bucket: BUCKET_NAME });
+
+Deno.test({
+  name: "creating a bucket",
+async fn(): Promise<void> {
+  await s3.createBucket({ Bucket: BUCKET_NAME })
+}})
 
 Deno.test({
   name: "PutObject into a bucket defined when constructing the S3 client",
   async fn(): Promise<void> {
-    const result = await s3.putObject({
+    const result: undefined |Doc = await s3.putObject({
       Key: ".gitignore",
       Body: '.env',
     });
+    
+    assertEquals(result, undefined);
   },
 });
 
 Deno.test({
   name: "PutObject into a bucket specified at calltime",
   async fn(): Promise<void> {
-    const result = await createClient().putObject({
-      Bucket: Deno.env.get("BUCKET_NAME"),
+    const result: undefined |Doc = await createClient().putObject({
+      Bucket: BUCKET_NAME,
       Key: "callback.js",
       Body: 'function cb() {}',
     });
+    
+    assertEquals(result, undefined);
   },
 });
 
@@ -37,3 +50,11 @@ Deno.test({
 //     assertEquals(0, 1);
 //   }
 // });
+
+// TODO: test case:  empty bucket in order 2 delete it
+
+Deno.test({
+  name: "deleting a bucket",
+async fn(): Promise<void> {
+  await s3.deleteBucket({ Bucket: BUCKET_NAME })
+}})

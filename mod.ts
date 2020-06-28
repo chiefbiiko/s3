@@ -16,7 +16,7 @@ export { Doc } from "./util.ts";
 
 /** Generic representation of a S3 client. */
 export interface S3Client {
-  [key: string]: (params: Doc, options?: Doc) => Promise<Doc>;
+  [key: string]: (params: Doc, options?: Doc) => Promise<undefined |Doc>;
 }
 
 /** Credentials. */
@@ -27,6 +27,7 @@ export interface Credentials {
 }
 
 /** Client configuration. */
+// TODO: think about casing of options - align with aws sdk js
 export interface ClientConfig {
   credentials?: Credentials | (() => Credentials | Promise<Credentials>);
   region?: string; // us-east-1
