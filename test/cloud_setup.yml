@@ -42,4 +42,4 @@ Outputs:
 
   UserSecretAccessKey:
     Description: Secret access key of the IAM user
-    Value: !GetAtt AccessKey.SecretAccessKeys
+    Value: !GetAtt AccessKey.SecretAccessKey
