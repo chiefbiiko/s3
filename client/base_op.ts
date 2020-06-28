@@ -34,12 +34,11 @@ export async function baseOp(
     translateJSON = false
   }: OpOptions = NO_PARAMS_OPS.has(op) ? params || {} : {}
 ): Promise<Doc> {
-  // TODO: doo this once in the factory
+  // TODO: how to avoid shared state more efficently?
   let _conf: ClientConfig = {...conf}
 
   if (params.Bucket) {
     Object.assign(_conf, deriveHostEndpoint({
-      // region: conf.region,
       bucket: params.Bucket,
       host: conf.host,
       port: conf.port,
@@ -67,8 +66,6 @@ export async function baseOp(
   } else {
     params = { ...params };
   }
-  
-  console.debug("base_op params", params);
 
   let rawResult: Doc = await baseFetch(_conf, httpVerb, params);
 

@@ -8,7 +8,7 @@ export { contentType } from "https://deno.land/x/media_types@v2.3.6/mod.ts";
 export {
   encode,
   decode
-} from "https://denopkg.com/chiefbiiko/std-encoding@v1.0.0/mod.ts";
+} from "https://denopkg.com/chiefbiiko/std-encoding@v1.1.0/mod.ts";
 
 export { extname } from "https://deno.land/std/path/mod.ts";
 
@@ -20,4 +20,4 @@ export { hmac } from "https://denopkg.com/chiefbiiko/hmac@v1.0.2/mod.ts";
 
 export { sha256 } from "https://denopkg.com/chiefbiiko/sha256@v1.0.2/mod.ts";
 
-export { md5 } from "https://denopkg.com/chiefbiiko/md5@v0.1.0/mod.ts";
+export { md5 } from "https://denopkg.com/chiefbiiko/md5@v0.2.0/mod.ts";

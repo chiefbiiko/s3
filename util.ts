@@ -82,13 +82,16 @@ export function toCanonicalQueryString(queryString: string): string {
     .join("&");
 }
 
+export function stripLeadingSlash(objectKey: string): string {
+  return objectKey.replace(LEADING_SLASH_PATTERN, "");
+}
+
 /** Transforms an object key to a canonical uri. */
 export function toCanonicalUri(objectKey: string): string {
   // return objectKey.startsWith("/") ? objectKey : `/${objectKey}`;
-  const cut: string = objectKey.replace(LEADING_SLASH_PATTERN, "");
+  // const cut: string = objectKey.replace(LEADING_SLASH_PATTERN, "");
   
-  return `/${encodeURIComponent(cut)}`
-  // return encodeURIComponent(objectKey);
+  return "/" + encodeURIComponent(stripLeadingSlash(objectKey));
 }
 
 /**

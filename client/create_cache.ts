@@ -23,15 +23,11 @@ export function createCache(conf: ClientConfig): Doc {
         // NOTE: bc conf flew thru deriveConfig .credentials is guaranteed
         credentials = conf.credentials!;
       }
-console.error("$$$$$$$$$$$$$$$$$ secretAccessKey", credentials.secretAccessKey)
-console.error("$$$$$$$$$$$$$$$$$ dateStamp", dateStamp)
-console.error("$$$$$$$$$$$$$$$$$ conf.region", conf.region)
-console.error("$$$$$$$$$$$$$$$$$ SERVICE", SERVICE)
 
       this._signingKey = kdf(
         credentials.secretAccessKey,
         dateStamp,
-        // NOTE: see above
+        // NOTE: bc conf flew thru deriveConfig .region is guaranteed
         conf.region!,
         SERVICE
       ) as Uint8Array;
