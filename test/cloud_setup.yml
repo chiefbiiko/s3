@@ -2,9 +2,6 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: Setup for testing s3 in the AWS cloud
 
 Resources:
-  Bucket:
-    Type: AWS::S3::Bucket
-
   User:
     Type: AWS::IAM::User
     Properties:
@@ -13,12 +10,10 @@ Resources:
           PolicyDocument:
             Version: 2012-10-17
             Statement:
-              - Sid: AllowFullAccessOnTestingBucket
+              - Sid: AllowFullAccessOnTestingBuckets
                 Effect: Allow
                 Action: s3:*
                 Resource:
-                  - !Sub arn:aws:s3:::${Bucket}
-                  - !Sub arn:aws:s3:::${Bucket}/*
                   - !Sub arn:aws:s3:::s3testingstack*
                   
   AccessKey:
@@ -28,10 +23,6 @@ Resources:
       UserName: !Ref User
 
 Outputs:
-  BucketName:
-    Description: Name of the S3 testing bucket
-    Value: !Ref Bucket
-
   UserArn:
     Description: IAM user with full access to S3
     Value: !GetAtt User.Arn
