@@ -14,9 +14,12 @@ import { Doc, camelCase, OPS_HTTP_VERBS } from "./util.ts";
 /** Convenience export. */
 export { Doc } from "./util.ts";
 
-/** Generic representation of a S3 client. */
+/**
+ * Generic representation of a S3 client.
+ * TODO: correct signature for each s3 method
+**/
 export interface S3Client {
-  [key: string]: (params: Doc, options?: Doc) => Promise<undefined |Doc>;
+  [key: string]: (params?: Doc) => Promise<undefined |Doc>;
 }
 
 /** Credentials. */
