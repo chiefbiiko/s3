@@ -60,13 +60,15 @@ Deno.test({
       .Contents
       .map(({ Key }: { Key: string }): { Key: string } => ({ Key }));
 
+    console.log("$$$ Objects", Objects)
+
     await s3.deleteObjects({ Delete: { Objects } });
   },
 });
 
-Deno.test({
-  name: "deleting a bucket",
-  async fn(): Promise<void> {
-    await s3.deleteBucket({ Bucket: BUCKET_NAME });
-  },
-});
+// Deno.test({
+//   name: "deleting a bucket",
+//   async fn(): Promise<void> {
+//     await s3.deleteBucket({ Bucket: BUCKET_NAME });
+//   },
+// });

@@ -4,7 +4,7 @@ import { Doc, stripLeadingSlash, toPayload, parsePayload } from "../util.ts";
 /** Base fetch. */
 export async function baseFetch(
   conf: Doc,
-  // op: string,
+  op: string,
   httpVerb: string,
   params: Doc
 ): Promise<undefined | Doc> {
@@ -50,7 +50,7 @@ export async function baseFetch(
 
       if (response.ok) {
         // TODO: detect response content-type and parse accordingly
-        return parsePayload(response);
+        return parsePayload(op, response);
       }
     }
 
@@ -59,5 +59,5 @@ export async function baseFetch(
 
   // TEMP,TODO: detect response content-type and parse accordingly
   // return {text: await response.text()}
-  return parsePayload(response);
+  return parsePayload(op, response);
 }

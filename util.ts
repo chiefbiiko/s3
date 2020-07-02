@@ -1,5 +1,7 @@
 import { encode } from "./deps.ts";
 import { ClientConfig } from "./mod.ts";
+import { parsers } from "./xml_handling/mod.ts"
+// import "./xml2js.ts";
 
 /** Matches anything but digits. */
 const ANY_BUT_DIGITS: RegExp = /[^\d]/g;
@@ -130,21 +132,49 @@ export async function toPayload(
 // }
 
 /** Parses a S3 response payload. */
-export async function parsePayload(response: Response): Promise<undefined | Doc> {
-  const contentLength: number = Number(response.headers.get("content-length")) || 0;
+export async function parsePayload(op: string, response: Response): Promise<undefined | Doc> {
+  // const contentLength: number = Number(response.headers.get("content-length")) || 0;
   
-  if (contentLength > 0) {
-    try {
-      const doc: Doc = await  response.json();
-      
-      return doc;
-    } catch(err) {
-      console.error("$$$$$$$$$$$$$$$$$$$$ parse err")
-      console.debug(err.stack);
-      
-      return {data: new Uint8Array(await response.arrayBuffer())};
-    }
+  const contentType: null | string = response.headers.get("content-type");
+  
+  console.log("$$$ contentType", contentType);
+  
+  if (contentType === "application/xml") {
+    const parse: (xml: string) => Doc = parsers[op];
+    
+    const xml: string = await response.text();
+    
+    return parse(xml)
+  } else if (contentType === "application/json") {
+    const doc: Doc = await  response.json();
+    
+    return doc;
   }
+  // else {
+  //   console.error("$$$ not xml not json")
+  // 
+  //   console.error("$$$ response.text()", await response.text())
+  // 
+  //   return {data: new Uint8Array(await response.arrayBuffer())};
+  // }
+  
+  // console.log("$$$ response.text()", await response.text());
+  // 
+  // console.log("$$$ contentLength", contentLength);
+  // console.log("$$$ response.url", response.url);
+  
+  // if (contentLength > 0) {
+  //   try {
+  //     const doc: Doc = await  response.json();
+  // 
+  //     return doc;
+  //   } catch(err) {
+  //     console.error("$$$ parse err")
+  //     console.debug(err.stack);
+  // 
+  //     return {data: new Uint8Array(await response.arrayBuffer())};
+  //   }
+  // }
   
   // try {
   //   const doc: Doc = await  response.json();

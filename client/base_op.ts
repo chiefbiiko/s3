@@ -25,7 +25,7 @@ import { ClientConfig } from "../mod.ts";
 /** Base op. */
 export async function baseOp(
   conf: ClientConfig,
-  _op: string,
+  op: string,
   httpVerb: string,
   params: Doc = {},
   // {
@@ -67,7 +67,7 @@ export async function baseOp(
   //   params = { ...params };
   // }
 
-  let rawResult: undefined | Doc = await baseFetch(_conf, httpVerb, params);
+  let rawResult: undefined | Doc = await baseFetch(_conf, op, httpVerb, params);
 
 return rawResult;
 
