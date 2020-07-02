@@ -56,11 +56,11 @@ Deno.test({
 Deno.test({
   name: "batch deleting objects",
   async fn(): Promise<void> {
-    const Objects = (await s3.listObjectsV2().promise())
+    const Objects = (await s3.listObjectsV2())
       .Contents
-      .map(({ Key }) => ({ Key }));
+      .map(({ Key }: { Key: string }): { Key: string } => ({ Key }));
 
-    await s3.deleteObjects({ Delete: { Objects } }).promise();
+    await s3.deleteObjects({ Delete: { Objects } });
   },
 });
 

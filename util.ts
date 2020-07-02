@@ -20,6 +20,8 @@ export const OPS_HTTP_VERBS: Map<string, string> = new Map<string, string>([
   ["PutObject", "PUT"],
   ["GetObject", "GET"],
   ["GetBucketLifecycleConfiguration", "GET"],
+  ["DeleteObjects", "DELETE"],
+  ["ListObjectsV2", "GET"]
 ]);
 
 /** Generic document. */
