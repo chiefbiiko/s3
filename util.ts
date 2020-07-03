@@ -1,6 +1,6 @@
 import { encode } from "./deps.ts";
 import { ClientConfig } from "./mod.ts";
-import { parsers } from "./xml_handling/mod.ts"
+import { parsers, stringifiers } from "./xml_handling/mod.ts"
 // import "./xml2js.ts";
 
 /** Matches anything but digits. */
@@ -109,21 +109,22 @@ export function toCanonicalUri(objectKey: string): string {
 export async function toPayload(
   { Body = "", BodyEncoding = "utf8" }: Doc,
 ): Promise<undefined | Uint8Array> {
-  if (Body instanceof Uint8Array) {
-    return Body;
-  }
-
-  if (typeof Body === "string") {
-    return encode(Body, BodyEncoding);
-  }
-
-  if ("readSync" in Body) {
-    return Deno.readAllSync(Body);
-  }
-
-  if ("read" in Body) {
-    return Deno.readAll(Body);
-  }
+   
+  // if (Body instanceof Uint8Array) {
+  //   return Body;
+  // }
+  // 
+  // if (typeof Body === "string") {
+  //   return encode(Body, BodyEncoding);
+  // }
+  // 
+  // if ("readSync" in Body) {
+  //   return Deno.readAllSync(Body);
+  // }
+  // 
+  // if ("read" in Body) {
+  //   return Deno.readAll(Body);
+  // }
 }
 
 // /** Whether given buffer is perfectly printable. */
